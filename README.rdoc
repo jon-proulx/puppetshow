@@ -1,6 +1,29 @@
-= puppetshow
+= PuppetShow
 
-Description goes here.
+PuppetShow is a Cucumber[http://cukes.info] extention for using
+VirtualBox[https://www.virtualbox.org/] virtual machines to test the
+behavior of applying Puppet[http://www.puppetlabs.com] configurations
+to live (virtual) systems.
+
+Vagrant[http://vagrantup.com] is used for managing the virtual systems
+including fetching base images from the internet.  The
+Sahara[https://github.com/jedi4ever/sahara]
+Vagrant[http://vagrantup.com] plugin is used to manage sandboxing teh
+virtual systems so changes introduced during test runs are rolled back
+and all tests run against a pristine image.
+
+== Caveats
+
+* we absolutely require vagrant (~> 1.0), sahara still requires vagrant
+  (~> 0.9)  -- untill sahara bumps a rev upstream this means to get
+  this to work at all you will need to kludge
+  $GEM_PATH/specifications/sahara-0.0.10.gemspec (I expect 0.0.11 will
+  allow for the newer vagrant)
+
+* this is very new code it is not nealy as DRY as is should be and
+  likely still contains hardcoded references to my development
+  environment -- best to think of it as an example of an idea rather
+  than a tool at this point 
 
 == Contributing to puppetshow
  
