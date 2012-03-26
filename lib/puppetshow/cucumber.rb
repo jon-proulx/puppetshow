@@ -7,7 +7,7 @@ World(PuppetShow::Api)
 ## VM stepps
 
 Given /^a vagrant vm (\S+) (?:is running|is up|)$/ do |box|
-  @mybox=VagrantBox.new(box,moduledir)
+  @mybox=PuppetShow::VagrantBox.new(box,moduledir)
   @mybox.up
 end
 
