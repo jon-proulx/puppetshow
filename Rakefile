@@ -9,6 +9,11 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
+
+# requiring 'rake/dsl_definition' defends against odd interations on
+# some Debian build systems where the system "rake" is 0.8.x and the
+# gem rake is 0.9.x
+require 'rake/dsl_definition'
 require 'rake'
 
 require 'jeweler'
