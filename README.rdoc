@@ -14,14 +14,7 @@ and all tests run against a pristine image.
 
 == Caveats
 
-* we absolutely require vagrant (~> 1.0), sahara still requires vagrant
-  (~> 0.9)  -- until sahara bumps a rev upstream this means to get
-  this to work at all you will need to kludge
-  $GEM_PATH/specifications/sahara-0.0.10.gemspec (I expect 0.0.11 will
-  allow for the newer vagrant)
-  https://github.com/jedi4ever/sahara/pull/7#issuecomment-4700378 
-
-* vagrant also has some apparently stale depends, json (~> 1.5.1)
+* vagrant  has some apparently stale depends, json (~> 1.5.1)
   which conflicts with rdoc and cucumber which both require json
   (1.6.6) https://github.com/mitchellh/vagrant/issues/838
 
