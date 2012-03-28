@@ -7,7 +7,7 @@ World(PuppetShow::Api)
 ## VM stepps
 
 Given /^a vagrant vm (\S+) (?:is running|is up|)$/ do |box|
-  @mybox=PuppetShow::VagrantBox.new(box,moduledir)
+  @mybox=PuppetShow::VagrantBox.new(box)
   @mybox.up
 end
 
@@ -30,10 +30,10 @@ end
 ## Puppet steps
 
 Given /^I apply the class (\w+)$/ do |puppet_class|
-  @mybox.sudo(puppet_cmd + "  apply --modulepath=/test -e \"include #{puppet_class}\"")
+  @mybox.sudo(PuppetShow::VagrantBox.puppet_cmd + "  apply --modulepath=#{@mybox.guest_test_dir} -e \"include #{puppet_class}\"")
 end
 Then /^the package (\w+) should be (installed|purged|uninstalled)$/ do |package, expected_state|
-  package_state=@mybox.execute(puppet_cmd + " resource package " + package)
+  package_state=@mybox.execute(PuppetShow::VagrantBox.puppet_cmd + " resource package " + package)
   
   if expected_state == "installed"
     if package_state.include?("ensure => 'purged',")
@@ -51,7 +51,7 @@ Then /^the service (\w+) should be (enabled|disabled) (?:on|in) the vm$/ do |ser
   
   # should be doing this directly with Net::SSH probably
   # also raises exception if <service> can't be found 
-  service_state=@mybox.execute(puppet_cmd + " resource service " + service)
+  service_state=@mybox.execute(PuppetShow::VagrantBox.puppet_cmd + " resource service " + service)
   
   if state == "enabled"
     expect_enable="true"
@@ -70,7 +70,7 @@ Then /^the service (\w+) should be (stopped|running) (?:on|in) the vm$/ do |serv
   # should be doing this directly with Net::SSH probably
   # also raises exception if <service> can't be found 
   # And it shouldn't be duplicated...
-  service_state=@mybox.execute(puppet_cmd + " resource service " + service)
+  service_state=@mybox.execute(PuppetShow::VagrantBox.puppet_cmd + " resource service " + service)
   
   unless service_state.include?("ensure => '" + expected_state + "',")
     raise "Service #{service} NOT IN STATE: ensure => #{expected_state}"
