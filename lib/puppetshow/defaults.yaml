@@ -1,0 +1,52 @@
+# command to call puppet by (default to just using OS $PATH)
+:puppet_cmd: puppet
+
+# workdir is the directory under which we will find
+# or create vagrant direcories for our VMs
+# these hold config and scratch space not disk images
+# disk image location is upto your VirtualBox config not us
+:workdir: /var/tmp/puppetshow
+
+# mounts (other than /vagrant) to mount
+# there currently must be a "test"
+# which contains the module structure under test
+:mounts: 
+  test: 
+    :guest_side: /test
+    :host_side: .
+#    :options: ":nfs => true"
+
+
+# config options for know boxen
+# particularly ugly in this config
+:known_vagrants:
+
+  # basebox name (as given by 'vagrant box list')
+  freebsd9-64: 
+
+    # appended to all mounts for this VM
+    # FreeBSD doesn't do vboxsf so we need nfs
+    # NFS is faster but requires root on host & nfs server packeges etc...
+    :folder_defaults: ,:nfs => true
+
+     #It really sucks that you need to put in \n's fo rnew lines
+    :config: "  config.vm.guest = :freebsd\n
+config.vm.network :hostonly, \"172.19.1.231\"\n
+config.vm.share_folder(\"v-root\", \"/vagrant\", \".\", :nfs => true)\n"
+     
+    #URL to download basbox from if local vagrant hasn't installe dit yet
+    :box_url: http://rocky-mountain.csail.mit.edu/pub/vagrant/freebsd9-64.box
+
+
+  ubuntu-oneric64: 
+    :box_url: http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-oneric64.box
+  ubuntu-oneric32: 
+    :box_url: http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-oneric32.box
+  gentoo-64: 
+    :box_url: http://dl.dropbox.com/u/4270274/gentoo64-0.7.box
+  lucid64: 
+    :box_url: http://files.vagrantup.com/lucid64.box
+  centos6.0-64: 
+    :box_url: http://dl.dropbox.com/u/1627760/centos-6.0-x86_64.box
+  ubuntu-precise64-beta1: 
+    :box_url: http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-precise64-beta1.box
