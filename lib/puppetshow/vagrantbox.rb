@@ -1,45 +1,33 @@
 require 'rubygems'
 require 'vagrant'
 require 'sahara'
+require 'yaml'
 
 module PuppetShow
   class VagrantBox
-    def initialize(basebox,testdir=nil)
+    @@config_file=nil
+    def self.configure(config_file=@@config_file)
+      defaults=File.join(File.dirname(__FILE__),"defaults.yaml")
+      config=YAML.load(File.read(defaults))
+      if config_file
+        @@config_file=config_file
+        config.merge!(YAML.load(File.read(config_file)))
+      end
+      @@workdir        = config[:workdir]
+      @@puppet_cmd     = config[:puppet_cmd]
+      @@mounts         = config[:mounts]
+      @@known_vagrants = config[:known_vagrants]
+      Dir.mkdir(@@workdir) unless File::directory?(@@workdir)
+    end
+
+    def self.puppet_cmd
+      @@puppet_cmd
+    end
+
+    def initialize(basebox)
+      VagrantBox.configure
+      @cwd = File.join(@@workdir,basebox) 
       @name=basebox
-      #brittle code...these should go in conf file soon###
-      @cwd=File.join("/scratch/vagrant-boxen",@name)
-      @known_vagrants = {
-        "lucid64"                => { 
-          :box_url => "http://files.vagrantup.com/lucid64.box",
-        },
-        "ubuntu-oneric64"        => {
-          :box_url =>"http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-oneric64.box",
-        },
-        "ubuntu-oneric32"        => {
-          :box_url =>"http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-oneric32.box",
-        },
-        "ubuntu-precise64-beta1" => {
-          :box_url => "http://rocky-mountain.csail.mit.edu/pub/vagrant/ubuntu-precise64-beta1.box",
-        },
-        "freebsd9-64"              => {
-          :box_url =>"http://rocky-mountain.csail.mit.edu/pub/vagrant/freebsd9-64.box",
-          :config => '''  config.vm.guest = :freebsd
-                            config.vm.network :hostonly, "172.19.1.231"
-                            config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
-                       ''',
-          :folder_defaults => ",:nfs => true",
-        },
-        "centos6.0-64"           => {
-          :box_url => "http://dl.dropbox.com/u/1627760/centos-6.0-x86_64.box",
-        },
-        "gentoo-64"              => {
-          :box_url =>"http://dl.dropbox.com/u/4270274/gentoo64-0.7.box",
-        },
-      }
-      # this allows specifying an unkown but extant vagrant box in our
-      # features
-      @known_vagrants.default={} 
-      ####################################################
       Dir.mkdir(@cwd) unless File::directory?(@cwd)
       
       @env=Vagrant::Environment.new(:cwd =>@cwd)
@@ -54,13 +42,18 @@ module PuppetShow
       end
       File.open(@vagrant_file,"w+") do |conf_file|
         conf_file.write "Vagrant::Config.run do |config|\n"
-        conf_file.write @known_vagrants[@name][:config]
+        conf_file.write @@known_vagrants[@name][:config]
         conf_file.write "  config.vm.box = \'#{@name}\'\n"
-        if @known_vagrants[@name][:box_url]
-          conf_file.write "  config.vm.box_url = \'#{@known_vagrants[@name][:box_url]}\'\n"
+        if @@known_vagrants[@name][:box_url]
+          conf_file.write "  config.vm.box_url = \'#{@@known_vagrants[@name][:box_url]}\'\n"
         end
-        if testdir
-          conf_file.write "  config.vm.share_folder(\"test\", \"/test\", \"#{testdir}\" #{@known_vagrants[@name][:folder_defaults]})\n"
+        @@mounts.each do |name, mount|
+          conf_file.write "  config.vm.share_folder(\"#{name}\",\"#{mount[:guest_side]}\" , \"#{mount[:host_side]}\""
+          if  @@known_vagrants[@name][:folder_defaults] || mount[:options]
+            conf_file.write ",\"#{mount[:options]} #{@@known_vagrants[@name][:folder_defaults]}\")\n"
+          else
+             conf_file.write  ")\n"
+           end
         end
         conf_file.write "end\n"
       end
@@ -85,6 +78,9 @@ module PuppetShow
       puts "done"
     end
     
+    def guest_test_dir
+      @@mounts['test'][:guest_side]
+    end
     ###########################################
     ##Sahara sandbox doesn't ingerit @cwd somehow
     ##eventhough we pass that to teh object that becomes @env
