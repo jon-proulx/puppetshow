@@ -17,6 +17,8 @@ module PuppetShow
       @@puppet_cmd     = config[:puppet_cmd]
       @@mounts         = config[:mounts]
       @@known_vagrants = config[:known_vagrants]
+      # this default allows unknow but extant baseboxes
+      @@known_vagrants.default = {}
       Dir.mkdir(@@workdir) unless File::directory?(@@workdir)
     end
 
@@ -42,11 +44,10 @@ module PuppetShow
       end
       File.open(@vagrant_file,"w+") do |conf_file|
         conf_file.write "Vagrant::Config.run do |config|\n"
-        conf_file.write @@known_vagrants[@name][:config]
+        conf_file.write @@known_vagrants[@name][:config] if @@known_vagrants[@name][:config]  
         conf_file.write "  config.vm.box = \'#{@name}\'\n"
-        if @@known_vagrants[@name][:box_url]
-          conf_file.write "  config.vm.box_url = \'#{@@known_vagrants[@name][:box_url]}\'\n"
-        end
+        conf_file.write "  config.vm.box_url = \'#{@@known_vagrants[@name][:box_url]}\'\n" if @@known_vagrants[@name][:box_url]
+
         @@mounts.each do |name, mount|
           conf_file.write "  config.vm.share_folder(\"#{name}\",\"#{mount[:guest_side]}\" , \"#{mount[:host_side]}\""
           if  @@known_vagrants[@name][:folder_defaults] || mount[:options]
