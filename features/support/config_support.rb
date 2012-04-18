@@ -2,9 +2,9 @@ module KnowsConfig
   
   class PuppetShowConfig
     
-    attr_reader :path
-    def initialize(path)
-      @path=path
+
+    def initialize(outfile)
+      @outfile=outfile
       @conf_data=Hash.new
     end
     
@@ -13,11 +13,14 @@ module KnowsConfig
     end
 
     def write
-      File.open(@path.path, "w") do |f|
+      File.open(path, "w") do |f|
         f.write(@conf_data.to_yaml)
       end
     end
 
+    def path
+      @outfile.path
+    end
 
   end #class
   
