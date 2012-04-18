@@ -9,5 +9,5 @@ Background
     Given the directory /tmp/puppetshow.feature.test does not exist
     And I have set :workdir to in my config.yaml to  /tmp/puppetshow.feature.test
     And I invoke PuppetShow::VagrantBox.configure(myconfig)
-    When I create a new  PuppetShow::VagrantBox instance
+    When I create a vagrant vm ubuntu-oneric64 
     Then the directory /tmp/puppetshow.feature.test should exist

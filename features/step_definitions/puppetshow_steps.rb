@@ -13,8 +13,8 @@ Given /^I invoke PuppetShow::VagrantBox\.configure\(myconfig\)$/ do
   PuppetShow::VagrantBox.configure(myconfig.path)
 end
 
-When /^I create a new  PuppetShow::VagrantBox instance$/ do
-  pending # express the regexp above with the code you wish you had
+When /^I create a vagrant vm (\S+)$/ do |box|
+  PuppetShow::VagrantBox.new(box)
 end
 
 Then /^the directory \/tmp\/puppetshow\.feature\.test should exist$/ do
