@@ -14,4 +14,5 @@ group :development do
   gem "bundler", "~> 1"
   gem "jeweler", "~> 1.8.3"
   gem "rcov", ">= 0"
+  gem "aruba","~>0.4"
 end

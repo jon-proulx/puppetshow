@@ -11,5 +11,6 @@ $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../lib')
 require 'puppetshow'
 require 'tempfile'
 require 'test/unit/assertions'
+require 'aruba/cucumber'
 
 World(Test::Unit::Assertions)
