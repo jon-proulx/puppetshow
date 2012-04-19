@@ -5,7 +5,7 @@ Given /^the directory "([^"]*)" does not exist$/ do |d|
 end
 
 Given /^I have set (\S+) to in my config\.yaml to "([^"]*)"$/ do |key,value|
-  myconfig.set(key,value)
+  myconfig.set(key.to_sym,value)
 end
 
 Given /^I invoke PuppetShow::VagrantBox\.configure\(config.yaml\)$/ do
