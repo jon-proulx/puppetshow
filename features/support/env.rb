@@ -8,7 +8,7 @@ rescue Bundler::BundlerError => e
 end
 
 $LOAD_PATH.unshift(File.dirname(__FILE__) + '/../../lib')
-require 'puppetshow'
+require 'puppetshow/vagrantbox'
 require 'tempfile'
 require 'test/unit/assertions'
 require 'aruba/cucumber'
